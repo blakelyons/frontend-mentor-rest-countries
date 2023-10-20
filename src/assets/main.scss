@@ -1,0 +1,174 @@
+@import "./base.scss";
+
+/* ----- Main Header ----- */
+header {
+    background: var(--header-bg);
+    transition: var(--default-transition);
+    &.sticky {
+        position: fixed;
+        top: 0;
+        z-index: 100;
+
+        .main-header {
+            min-height: 0;
+        }
+
+        .search-bar {
+            scale: 0;
+            height: 0;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    .main-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        padding: 0.5rem 0;
+        box-shadow: 0 0 5px hsla(0, 0%, 0%, 25%);
+        min-height: 4.5rem;
+        background: var(--element-bg);
+        z-index: 10;
+        transition: var(--default-transition);
+
+        h1 {
+            margin: 0;
+            padding: 0;
+            font-weight: 800;
+            font-size: 1rem;
+
+            @media screen and (min-width: 40em) {
+                font-size: 1.5rem;
+            }
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    max-width: 75rem;
+
+    @media screen and (min-width: 40em) {
+        padding-right: 4rem;
+        padding-left: 4rem;
+        max-width: 90rem;
+    }
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    z-index: 200;
+
+    .button--scroll-top {
+        padding: 0.5em;
+        background: var(--button-scroll-top-bg);
+        color: var(--button-scrol-top-color);
+    }
+}
+
+.loading {
+    display: grid;
+    justify-content: center;
+    transform: translateY(200%);
+
+    span {
+        animation: ellipse 1s linear infinite;
+    }
+
+    span:nth-child(1) {
+        animation-delay: 0.2s;
+    }
+
+    span:nth-child(2) {
+        animation-delay: 0.3s;
+    }
+
+    span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+}
+
+.loader {
+    --_clr-primary: var(--clr-dark-blue);
+    --_secondary: var(--clr-dark-gray);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    border: 3px solid;
+    border-color: var(--_secondary) var(--_secondary) transparent transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    margin: 2rem auto;
+}
+.loader::after,
+.loader::before {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border: 3px solid;
+    border-color: transparent transparent var(--_clr-primary) var(--_clr-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    animation: rotationBack 0.5s linear infinite;
+    transform-origin: center center;
+}
+.loader::before {
+    width: 32px;
+    height: 32px;
+    border-color: var(--_secondary) var(--_secondary) transparent transparent;
+    animation: rotation 1.5s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@keyframes rotationBack {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+// Fade in and out dots
+@keyframes ellipse {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
