@@ -139,6 +139,8 @@ onMounted(() => {
         color: inherit;
         text-decoration: none;
         transition: all 0.2s ease-in-out;
+        border-radius: var(--global-radius);
+        overflow: hidden;
 
         &:hover {
             transform: scale(1.02);
