@@ -2,6 +2,7 @@
     <div class="main-header">
         <div class="container">
             <h1>Where in the world?</h1>
+            <!-- TODO Make this clickable to go "home"-->
             <Transition name="fade">
                 <button @click="toggleTheme" class="button button--clear button--has-icon" v-if="!props.loading">
                     <i class="icon icon--left icon-moon material-symbols-outlined"> {{ theme === "light" ? `dark_mode` : `light_mode` }} </i>

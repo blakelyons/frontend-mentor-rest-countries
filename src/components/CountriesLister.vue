@@ -41,15 +41,15 @@
                             </div>
                             <div class="countries-lister__item-info">
                                 <h2>{{ country.name.common }}</h2>
-                                <p><b>Population: </b>{{ country.population }}</p>
+                                <p><b>Population: </b>{{ formattedNumber(country.population) }}</p>
                                 <p><b>Region: </b>{{ country.region }}</p>
                                 <p><b>Capital: </b>{{ country.capital && country.capital.length > 0 ? country.capital[0] : "n/a" }}</p>
                             </div>
                         </a>
                     </div>
                 </Transition>
-                <!-- TODO Make this a funny graphic ?? -->
-                <div class="no-results">
+                <div class="no-results" v-if="props.filteredCountries && props.filteredCountries.length === 0">
+                    <p><span class="icon icon-no-results material-symbols-outlined"> sentiment_dissatisfied </span></p>
                     <p>Oops! No results found!</p>
                 </div>
             </div>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import {ref, watch, onMounted} from "vue";
+import {ref, watch, onMounted, computed} from "vue";
 import CountryDetails from "@/components/CountryDetails.vue";
 import {useCountryStore} from "@/stores/CountryStore";
 import {useOpenCountryDetailsStore} from "@/stores/OpenCountryDetailsStore";
@@ -93,6 +93,14 @@ const openDetailsHandler = (country) => {
         loading.value = false;
     }, 400);
 };
+
+const formattedNumber = computed(() => (number) => {
+    // A function that formats the number with commas
+    if (typeof number === "number") {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    return number;
+});
 
 watch(
     () => countryStore.getSelectedCountry, // The getter function to watch
@@ -187,6 +195,12 @@ onMounted(() => {
 }
 
 .no-results {
-    margin-top: 5rem;
+    margin-top: 20vh;
+    text-align: center;
+    font-size: 1.5rem;
+
+    .icon {
+        font-size: 3rem;
+    }
 }
 </style>

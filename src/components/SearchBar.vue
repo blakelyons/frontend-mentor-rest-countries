@@ -10,9 +10,11 @@
                         id="keyword-search"
                         name="keyword-search"
                         aria-label="Keyword Search"
+                        ref="keywordSearchInput"
                         v-model="keywordSearch"
                         @keyup="keywordSearchHandler"
                     />
+                    <TooltipHelpButton>Search by Country Name, Region, Capital, or Language</TooltipHelpButton>
                 </div>
             </Transition>
 
@@ -74,9 +76,10 @@
 </template>
 
 <script setup>
-import {ref, watch} from "vue";
+import {ref, watch, onMounted} from "vue";
 import {useOpenCountryDetailsStore} from "@/stores/OpenCountryDetailsStore";
 import {useCountryStore} from "@/stores/CountryStore";
+import TooltipHelpButton from "@/components/TooltipHelpButton.vue";
 
 const openDetailsStore = useOpenCountryDetailsStore();
 const countryStore = useCountryStore();
@@ -86,7 +89,7 @@ const props = defineProps({
     loading: Boolean,
     hideSearchBar: Boolean,
     selectedRegionValue: String,
-    keyWordSearchValue: String,
+    clearKeywordSearch: Boolean,
 });
 
 const emit = defineEmits(["filteredCountries", "scrollToPreviousCountry"]);
@@ -95,6 +98,7 @@ const loadingRegions = ref(true);
 const enableHoverEffect = ref(false);
 
 const keywordSearch = ref("");
+const keywordSearchInput = ref(null);
 const dropdownOpen = ref(false);
 
 const filteredCountries = ref(null);
@@ -137,21 +141,29 @@ const filterRegionHandler = (region) => {
     }, 200);
 };
 
-const keywordSearchHandler = () => {
-    // Filter Countries by Keyword Search checking Country Common Name and Region
-    filteredCountries.value = countryStore.getCountries.filter((country) => {
-        return (
-            country.name.common.toLowerCase().includes(keywordSearch.value.toLowerCase()) ||
-            country.region.toLowerCase().includes(keywordSearch.value.toLowerCase())
-        );
-    });
+const keywordSearchHandler = (event) => {
+    //keywordSearch.value = event.target.value;
+    keywordSearch.value = event.target.value;
 
-    // Search Capitals Array if Keyword Search is not found in Country Common Name or Region
-    if (filteredCountries.value.length === 0) {
-        filteredCountries.value = countryStore.getCountries.filter((country) => {
-            return country.capital && country.capital.length > 0 && country.capital[0].toLowerCase().includes(keywordSearch.value.toLowerCase());
-        });
+    if (keywordSearch.value === "") {
+        // If the search input is empty, show all countries
+        emit("filteredCountries", countryStore.getCountries);
+        return;
     }
+
+    const keywords = keywordSearch.value.trim().toLowerCase().split(" ");
+
+    filteredCountries.value = countryStore.getCountries.filter((country) => {
+        const name = country.name.common || "";
+        const region = country.region || "";
+        const capital = country.capital && country.capital.length > 0 ? country.capital[0] : "";
+        const languages = country.languages ? Object.values(country.languages).join(" ") : "";
+
+        const countryData = (name + region + capital + languages).toLowerCase();
+
+        // Check if all keywords are found in the concatenated country data
+        return keywords.every((keyword) => countryData.includes(keyword));
+    });
 
     emit("filteredCountries", filteredCountries.value);
 };
@@ -159,7 +171,6 @@ const keywordSearchHandler = () => {
 const goBack = () => {
     openDetailsStore.setOpenDetails(false);
     openDetailsStore.setHideSearchBar(false);
-    console.log(`Selected Country Go Back: ${countryStore.selectedCountry.name.common}`);
     emit("scrollToPreviousCountry", countryStore.selectedCountry.name.common);
 };
 
@@ -175,6 +186,23 @@ watch(
     },
     {immediate: true, deep: true}
 );
+
+// Watch for clearKeywordSearch and clear the keywordSearch value
+watch(
+    () => props.clearKeywordSearch,
+    (newValue) => {
+        if (newValue) {
+            keywordSearch.value = "";
+        }
+    },
+    {immediate: true, deep: true}
+);
+
+onMounted(() => {
+    setTimeout(() => {
+        keywordSearchInput.value.focus();
+    }, 1000);
+});
 </script>
 
 <style lang="scss" scoped>

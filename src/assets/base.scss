@@ -63,6 +63,11 @@
     --button-scroll-top-bg: var(--clr-dark-blue);
     --button-scrol-top-color: var(--clr-white);
     --button-hover-bg: var(--clr-light-gray);
+
+    // Tooltip
+    --tooltip-button-color: var(--clr-dark-gray);
+    --tooltip-text-color: hsl(207, 26%, 10%);
+    --tooltip-bg: var(--clr-dark-blue);
 }
 
 // Dark Mode Settings
@@ -86,6 +91,9 @@
     --button-scroll-top-bg: var(--clr-light-gray);
     --button-scrol-top-color: var(--clr-very-dark-blue);
     --button-hover-bg: hsl(209, 23%, 30%);
+
+    --tooltip-button-color: hsl(209, 23%, 30%);
+    --tooltip-bg: var(--clr-light-gray);
 }
 
 *,
@@ -171,6 +179,10 @@ b {
     box-shadow: var(--box-shadow);
     transition: var(--default-transition);
 
+    &--tooltip {
+        position: relative;
+    }
+
     span {
         font-weight: inherit;
         transition: var(--default-transition);
@@ -194,6 +206,13 @@ b {
     &--clear {
         border: none;
         box-shadow: none;
+        background: transparent;
+
+        &:active,
+        &:hover,
+        &:focus {
+            background: transparent !important;
+        }
     }
 
     &:hover,

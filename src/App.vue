@@ -5,6 +5,7 @@
             :regions="regions"
             :hideSearchBar="openDetailsStore.hideSearchBar"
             :loading="loading"
+            :clearKeywordSearch="clearKeywordSearch"
             @filtered-countries="filterCountries"
             @scroll-to-previous-country="scrollToCountry"
         />
@@ -66,10 +67,11 @@ const filterCountries = (obj) => {
 };
 
 // Clearing Region and Keyword Search
+const clearKeywordSearch = ref(false);
 const clearFilters = () => {
-    console.log("Clear Filters");
     filteredCountries.value = null;
     countryStore.setSelectedRegion(null);
+    clearKeywordSearch.value = true;
 };
 
 const scrollToCountry = (country) => {
