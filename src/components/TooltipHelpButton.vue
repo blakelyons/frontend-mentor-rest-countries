@@ -1,11 +1,11 @@
 <template>
-    <button class="button button--clear button--has-icon button--tooltip" @click="openTooltip = !openTooltip">
-        <div :class="`tooltip ${openTooltip ? `tooltip--open` : ``}`">
+    <button class="button button--clear button--has-icon button--tooltip" @click="openTooltip = !openTooltip" aria-label="Open Tooltip">
+        <span :class="`tooltip ${openTooltip ? `tooltip--open` : ``}`">
             <span class="tooltip__text">
                 <slot></slot>
             </span>
             <span class="material-symbols-outlined close-tooltip"> close </span>
-        </div>
+        </span>
         <span class="material-symbols-outlined icon icon--help"> help </span>
     </button>
 </template>
