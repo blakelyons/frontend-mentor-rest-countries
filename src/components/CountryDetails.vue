@@ -55,7 +55,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="border-countries">
+                    <div class="border-countries" v-if="borderCountries">
                         <div :class="`${props.loading ? `skeleton-text skeleton-effect-wave` : ``}`"><b>Border Countries: </b></div>
                         <div class="border-countries__list">
                             <template v-for="country in borderCountries" :key="country">
