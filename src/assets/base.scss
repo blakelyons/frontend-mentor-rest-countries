@@ -25,7 +25,6 @@
 
 // Global Properties
 :root {
-    --font-base-size: 1rem;
     --global-radius: 0.3rem;
     --box-shadow: 0 0 0.75rem hsla(0, 0%, 0%, 20%);
     --box-shadow-hover: 0 0 2rem hsla(0, 0%, 0%, 40%);
@@ -40,7 +39,7 @@
     --clr-dark-gray: hsl(0, 0%, 52%);
     --clr-light-gray: hsl(0, 0%, 98%);
 
-    --default-transition: all 0.2s ease;
+    --default-transition: all 1s cubic-bezier(0.03, 0.85, 0.4, 0.99);
 }
 
 // Light Mode Settings
@@ -159,7 +158,11 @@ b {
 
 /* ----- Buttons & Icons ----- */
 .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
 }
 
 .button {
@@ -220,7 +223,11 @@ b {
     &:focus {
         background: var(--button-hover-bg);
         .icon-moon {
-            font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+            font-variation-settings:
+                "FILL" 1,
+                "wght" 400,
+                "GRAD" 0,
+                "opsz" 24;
         }
     }
 
@@ -355,7 +362,9 @@ input[type="text"],
                 translate: var(--_translate, 0);
                 scale: 1 var(--_scale, 0);
                 background-color: var(--select-option-hover-bg);
-                transition: scale 100ms var(--_scale-delay, 0ms), translate 200ms;
+                transition:
+                    scale 100ms var(--_scale-delay, 0ms),
+                    translate 200ms;
             }
 
             &:hover ~ li {

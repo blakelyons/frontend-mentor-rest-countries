@@ -1,6 +1,6 @@
 <template>
-    <main>
-        <div class="container">
+    <main id="countries-lister-wrapper">
+        <div id="countries-lister-content" class="container">
             <CountryDetails
                 :openDetails="openDetailsStore.openDetails"
                 :selectedCountry="selectedCountry"
@@ -27,20 +27,20 @@
 
             <div class="countries-lister" v-if="!props.loading && !props.loadingFilteredResults">
                 <Transition name="fade" v-if="!openDetailsStore.openDetails">
-                    <div class="grid col-4">
+                    <div v-if="!props.loading" class="grid col-4">
                         <a
                             href="#"
-                            :id="country.name.common.replace(/\s/g, '')"
+                            :id="(country.name?.common ?? '').replace(/\s/g, '') || `country-${index}`"
                             @click="openDetailsHandler(country)"
                             class="countries-lister__item"
                             v-for="(country, index) in props.filteredCountries ? props.filteredCountries : props.countries"
                             :key="index"
                         >
                             <div class="countries-lister__item-flag">
-                                <img :src="country.flags.png" :alt="`${country.name.common} Flag`" />
+                                <img :src="country.flags?.png" :alt="`${country.name?.common ?? 'Country'} Flag`" />
                             </div>
                             <div class="countries-lister__item-info">
-                                <h2>{{ country.name.common }}</h2>
+                                <h2>{{ country.name?.common ?? "Unknown" }}</h2>
                                 <p><b>Population: </b>{{ formattedNumber(country.population) }}</p>
                                 <p><b>Region: </b>{{ country.region }}</p>
                                 <p><b>Capital: </b>{{ country.capital && country.capital.length > 0 ? country.capital[0] : "n/a" }}</p>
@@ -131,8 +131,9 @@ onMounted(() => {
     min-height: 50vh;
 
     @media screen and (min-width: 40em) {
-        margin-top: 4rem;
+        padding-top: 4rem;
     }
+
     .countries-lister__item {
         background: var(--element-bg);
         box-shadow: var(--box-shadow);

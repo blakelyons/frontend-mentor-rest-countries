@@ -1,4 +1,4 @@
-// Configuration for Prettier code formatter
+// Configuration for Prettier code formatter (CommonJS for extension compatibility)
 module.exports = {
     tabWidth: 4, // We indent 4 spaces
     useTabs: false, // We do not use tabs

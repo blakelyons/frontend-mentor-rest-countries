@@ -78,12 +78,13 @@ watch(openTooltip, (newValue) => {
         opacity: 1;
         scale: 1;
         transform: translateY(0);
+        z-index: 1000;
     }
 
     .close-tooltip {
         cursor: pointer;
         position: relative;
-        z-index: 1000;
+        z-index: 1001;
         color: inherit;
         font-weight: 600;
     }

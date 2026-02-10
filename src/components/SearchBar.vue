@@ -1,7 +1,7 @@
 <template>
     <section class="search-bar">
         <div class="container grid col-2" v-show="!loading">
-            <Transition name="slide-fade-up">
+            <Transition :css="false" @before-enter="onSlideBeforeEnter" @enter="onSlideEnter" @leave="onSlideLeave">
                 <div class="keyword-search flex flex--row flex--nowrap flex--align-center flex--justify-start" v-if="!props.hideSearchBar">
                     <a href="#" @click="keywordSearchHandler"><i class="icon icon-search material-symbols-outlined"> search </i></a>
                     <input
@@ -27,7 +27,7 @@
                 </div>
             </Transition>
 
-            <Transition name="slide-fade-up">
+            <Transition :css="false" @before-enter="onSlideBeforeEnter" @enter="onSlideEnter" @leave="onSlideLeave">
                 <div class="region-filter flex flex--row flex--nowrap flex--align-center flex--justify-end" v-if="!props.hideSearchBar">
                     <nav class="select-dropdown">
                         <div class="select" @click="dropdownHandler">
@@ -72,14 +72,51 @@
                 </div>
             </Transition>
         </div>
+        <div class="container">
+            <div class="clear-buttons">
+                <button class="button button--has-icon clear-search" @click="clearSearch" v-if="keywordSearch.length > 0">
+                    <i class="icon icon--left icon-arrow-left material-symbols-outlined"> close </i>
+                    <span>Clear Search</span>
+                </button>
+                <button class="button button--has-icon clear-region" @click="clearRegion" v-if="countryStore.selectedRegion !== null">
+                    <i class="icon icon--left icon-arrow-left material-symbols-outlined"> close </i>
+                    <span>Clear Region</span>
+                </button>
+            </div>
+        </div>
     </section>
 </template>
 
 <script setup>
 import {ref, watch, onMounted} from "vue";
+import {gsap} from "gsap";
 import {useOpenCountryDetailsStore} from "@/stores/OpenCountryDetailsStore";
 import {useCountryStore} from "@/stores/CountryStore";
 import TooltipHelpButton from "@/components/TooltipHelpButton.vue";
+
+function onSlideBeforeEnter(el) {
+    gsap.set(el, {y: "-100%", opacity: 0});
+}
+
+function onSlideEnter(el, done) {
+    gsap.to(el, {
+        y: 0,
+        opacity: 1,
+        duration: 0.35,
+        ease: "power2.out",
+        onComplete: done,
+    });
+}
+
+function onSlideLeave(el, done) {
+    gsap.to(el, {
+        y: "-100%",
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.in",
+        onComplete: done,
+    });
+}
 
 const openDetailsStore = useOpenCountryDetailsStore();
 const countryStore = useCountryStore();
@@ -115,25 +152,39 @@ const dropdownHandler = () => {
 const countries = ref(null);
 const selectedRegion = ref(null);
 
+/** Countries to use as base for filtering: either all, or only the selected region (respects "All Regions"). */
+function getBaseListByRegion() {
+    const all = countryStore.getCountries;
+    const region = countryStore.selectedRegion;
+    if (!region || region === "All Regions") return all;
+    return all.filter((country) => country.region === region);
+}
+
+function applyKeywordFilter(list) {
+    const q = keywordSearch.value.trim().toLowerCase();
+    if (!q) return list;
+    const keywords = q.split(" ");
+    return list.filter((country) => {
+        const name = (country.name?.common ?? "").toString();
+        const region = (country.region ?? "").toString();
+        const capital =
+            country.capital && country.capital.length > 0 ? String(country.capital[0]) : "";
+        const languages = country.languages ? Object.values(country.languages).join(" ") : "";
+        const countryData = (name + " " + region + " " + capital + " " + languages).toLowerCase();
+        return keywords.every((keyword) => countryData.includes(keyword));
+    });
+}
+
 const filterRegionHandler = (region) => {
     countryStore.setSelectedRegion(region ? region : null);
     selectedRegion.value = region;
 
-    if (countryStore.selectedRegion === "All Regions") {
-        filteredCountries.value = countryStore.getCountries;
-        emit("filteredCountries", filteredCountries.value);
+    const baseList =
+        !region || region === "All Regions"
+            ? countryStore.getCountries
+            : countryStore.getCountries.filter((country) => country.region === region);
 
-        setTimeout(() => {
-            dropdownHandler();
-        }, 200);
-
-        return;
-    }
-
-    filteredCountries.value = countryStore.getCountries.filter((country) => {
-        return country.region === region;
-    });
-
+    filteredCountries.value = applyKeywordFilter(baseList);
     emit("filteredCountries", filteredCountries.value);
 
     setTimeout(() => {
@@ -142,36 +193,28 @@ const filterRegionHandler = (region) => {
 };
 
 const keywordSearchHandler = (event) => {
-    //keywordSearch.value = event.target.value;
     keywordSearch.value = event.target.value;
+    const baseList = getBaseListByRegion();
+    filteredCountries.value = applyKeywordFilter(baseList);
+    emit("filteredCountries", filteredCountries.value);
+};
 
-    if (keywordSearch.value === "") {
-        // If the search input is empty, show all countries
-        emit("filteredCountries", countryStore.getCountries);
-        return;
-    }
+const clearSearch = () => {
+    keywordSearch.value = "";
+    emit("filteredCountries", getBaseListByRegion());
+};
 
-    const keywords = keywordSearch.value.trim().toLowerCase().split(" ");
-
-    filteredCountries.value = countryStore.getCountries.filter((country) => {
-        const name = country.name.common || "";
-        const region = country.region || "";
-        const capital = country.capital && country.capital.length > 0 ? country.capital[0] : "";
-        const languages = country.languages ? Object.values(country.languages).join(" ") : "";
-
-        const countryData = (name + region + capital + languages).toLowerCase();
-
-        // Check if all keywords are found in the concatenated country data
-        return keywords.every((keyword) => countryData.includes(keyword));
-    });
-
+const clearRegion = () => {
+    countryStore.setSelectedRegion(null);
+    filteredCountries.value = countryStore.getCountries;
     emit("filteredCountries", filteredCountries.value);
 };
 
 const goBack = () => {
+    const countryName = countryStore.selectedCountry?.name?.common;
     openDetailsStore.setOpenDetails(false);
     openDetailsStore.setHideSearchBar(false);
-    emit("scrollToPreviousCountry", countryStore.selectedCountry.name.common);
+    if (countryName) emit("scrollToPreviousCountry", countryName);
 };
 
 watch(props.regions, () => {
@@ -211,12 +254,27 @@ onMounted(() => {
     height: 120px;
     border-radius: 50%;
 }
+.clear-search {
+    margin-right: auto;
+}
+.clear-region {
+    margin-left: auto;
+}
+.clear-buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+}
 .search-bar {
     display: block;
-    margin: 2rem 0;
-    padding: 0;
+    padding: 2rem 0;
+    margin: 0;
     min-height: 54px;
     transition: var(--default-transition);
+    background-color: var(--body-bg-color);
+
     .keyword-search {
         position: relative;
         color: var(--input-text-color);
@@ -245,6 +303,8 @@ onMounted(() => {
     }
 
     .region-filter {
+        position: relative;
+        z-index: 0;
         @media screen and (max-width: 40em) {
             margin-top: 1.5rem;
             justify-content: flex-start;

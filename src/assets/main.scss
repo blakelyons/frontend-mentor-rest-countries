@@ -4,22 +4,25 @@
 header {
     background: var(--header-bg);
     transition: var(--default-transition);
+    top: 0;
+
     &.sticky {
         position: fixed;
         top: 0;
-        z-index: 100;
+        z-index: 99999999999;
 
-        .main-header {
-            min-height: 0;
-        }
+        // .main-header {
+        //     height: auto;
+        //     transition: var(--default-transition);
+        // }
 
-        .search-bar {
-            scale: 0;
-            height: 0;
-            min-height: 0;
-            padding: 0;
-            margin: 0;
-        }
+        // .search-bar {
+        //     height: 3.875rem;
+        //     min-height: auto;
+        //     padding: 1rem 0;
+        //     margin: 0;
+        //     transition: var(--default-transition);
+        // }
     }
 
     .main-header {
@@ -29,10 +32,10 @@ header {
         position: relative;
         padding: 0.5rem 0;
         box-shadow: 0 0 5px hsla(0, 0%, 0%, 25%);
-        min-height: 4.5rem;
         background: var(--element-bg);
-        z-index: 10;
+        z-index: 99999;
         transition: var(--default-transition);
+        height: 4.5rem;
 
         h1 {
             margin: 0;
