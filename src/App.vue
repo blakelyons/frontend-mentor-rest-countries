@@ -191,7 +191,7 @@ watch(scrolled, (isScrolled) => {
             .to(
                 ".search-bar",
                 {
-                    padding: "1rem 0 2rem 0",
+                    padding: "1rem 0",
                 },
                 "<"
             );
@@ -203,7 +203,7 @@ watch(scrolled, (isScrolled) => {
             .to(
                 ".search-bar",
                 {
-                    padding: "2rem 0 2rem 0",
+                    padding: "2rem 0",
                 },
                 "<"
             );
