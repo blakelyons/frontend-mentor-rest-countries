@@ -96,46 +96,37 @@ onMounted(async () => {
         document.documentElement.setAttribute("data-theme", "light");
     }
 
-    // Get Countries Data
-    await fetch("https://restcountries.com/v3.1/all")
-        .then((response) => response.json())
-        .then((data) => {
-            countries.value = data;
-            const sortedCountries = countries.value.slice().sort((a, b) => {
-                const nameA = a.name.common.toLowerCase();
-                const nameB = b.name.common.toLowerCase();
+    // Get Countries Data (API requires fields param for /all)
+    const fields = "name,capital,region,subregion,population,flags,languages,currencies,tld,borders";
+    const response = await fetch(`https://restcountries.com/v3.1/all?fields=${fields}`);
+    const data = await response.json();
 
-                if (nameA < nameB) return -1;
-                if (nameA > nameB) return 1;
-                return 0;
-            });
+    if (!response.ok || !Array.isArray(data)) {
+        console.error("Failed to load countries:", data?.message || response.statusText);
+        loading.value = false;
+        return;
+    }
 
-            countries.value = sortedCountries;
-
-            //console.table(countries.value);
-
-            countryStore.setCountries(sortedCountries);
-        })
-        .then(() => {
-            setTimeout(() => {
-                loading.value = false;
-            }, 400);
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-
-    countries.value.forEach((country) => {
-        // Push Regions
-        regions.value.push(country.region);
+    const sortedCountries = data.slice().sort((a, b) => {
+        const nameA = (a.name?.common ?? "").toLowerCase();
+        const nameB = (b.name?.common ?? "").toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
     });
 
-    // Remove Duplicates
+    countries.value = sortedCountries;
+    countryStore.setCountries(sortedCountries);
+
+    sortedCountries.forEach((country) => {
+        if (country.region) regions.value.push(country.region);
+    });
     regions.value = [...new Set(regions.value)];
-
-    // Sort Countries & Regions Alphabetically
-
     regions.value.sort();
+
+    setTimeout(() => {
+        loading.value = false;
+    }, 400);
 
     // Check if the Window has scrolled more than the height of the <header> then add .sticky class
     window.addEventListener("scroll", () => {

@@ -40,16 +40,16 @@
                             <p :class="`${props.loading ? `skeleton-text skeleton-effect-wave` : ``}`">
                                 <b>Currencies: </b>
                                 {{
-                                    props.selectedCountry.currencies && props.selectedCountry.currencies.length > 0
-                                        ? props.selectedCountry.currencies[0]
+                                    props.selectedCountry.currencies && Object.keys(props.selectedCountry.currencies).length > 0
+                                        ? Object.values(props.selectedCountry.currencies).map((c) => c?.name ?? c).join(", ")
                                         : "n/a"
                                 }}
                             </p>
                             <p :class="`${props.loading ? `skeleton-text skeleton-effect-wave` : ``}`">
                                 <b>Languages: </b>
                                 {{
-                                    props.selectedCountry.languages && props.selectedCountry.languages.length > 0
-                                        ? props.selectedCountry.languages[0]
+                                    props.selectedCountry.languages && Object.keys(props.selectedCountry.languages).length > 0
+                                        ? Object.values(props.selectedCountry.languages).join(", ")
                                         : "n/a"
                                 }}
                             </p>
